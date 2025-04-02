@@ -6,9 +6,7 @@
  *)
 
 (**
-A mostly-complete consistency proof for [PTRS] base upon [inductive_ptrs.v]. The main
-difference is that this file defines offset normalization as a string-rewrite system
-instead of using a Coq function.
+A mostly-complete consistency proof for [PTRS] base upon [inductive_ptrs.v]. The main difference is that this file defines offset normalization as a string-rewrite system instead of using a Rocq function.
 *)
 
 Require Import Equations.Prop.Equations.
@@ -36,6 +34,13 @@ Implicit Types (σ : genv) (z : Z).
 
 Module PTRS_IMPL <: PTRS_INTF.
   Import canonical_tu address_sums merge_elems.
+
+  (*
+   * Outline of setup:
+   * To fulfil the axioms of this signature, we first have a "raw" offset type which directly gives a constructor for each constructor function in the signature, and then we define a notion of offset _normalization_. The real pointer offset type is then just a raw offset along with a proof that the offset is normalized.
+   * Normalization is specified as a string rewrite system. The normalization function is then just performs the most obvious eager evaluation strategy on this rewrite system -- i.e it is the fixpoint of the function that performs the leftmost rewrite on an offset. That function is `find_redex`, the normalization function itself is called `normalize`.
+   * From here we prove that the normalization function is sound and complete wrt the rewrite system. This makes the proofs of the pointer axioms quite simple.
+  *)
 
   Inductive raw_offset_seg : Set :=
   | o_field_ (* type-name: *) (f : field)
